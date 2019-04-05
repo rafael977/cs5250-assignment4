@@ -29,6 +29,9 @@ class ExtendedProcess(Process):
         self.completion_time = arrive_time + burst_time
         self.remaining_time = burst_time
 
+    def getWaitingTime(self):
+        return self.completion_time - self.arrive_time - self.burst_time
+
 def FCFS_scheduling(process_list):
     #store the (switching time, proccess_id) pair
     schedule = []
@@ -47,7 +50,35 @@ def FCFS_scheduling(process_list):
 #Output_1 : Schedule list contains pairs of (time_stamp, proccess_id) indicating the time switching to that proccess_id
 #Output_2 : Average Waiting Time
 def RR_scheduling(process_list, time_quantum ):
-    return (["to be completed, scheduling process_list on round robin policy with time_quantum"], 0.0)
+    ext_process_list = [ExtendedProcess(p.id, p.arrive_time, p.burst_time) for p in process_list]
+    schedule = []
+    current_time = 0
+    completed_count = 0
+    total_count = len(ext_process_list)
+
+    while completed_count < total_count:
+        print(completed_count, total_count)
+        is_idle = True
+        for process in ext_process_list:
+            if process.arrive_time <= current_time and process.remaining_time > 0:
+                print("processing ", process.id, current_time)
+                schedule.append((current_time, process.id))
+                is_idle = False
+                if time_quantum < process.remaining_time:
+                    current_time += time_quantum
+                    process.remaining_time -= time_quantum
+                else:
+                    print(process.id, "completed")
+                    current_time += process.remaining_time
+                    process.remaining_time = 0
+                    process.completion_time = current_time
+                    completed_count += 1
+        if is_idle:
+            g = (process for process in ext_process_list if process.remaining_time > 0)
+            current_time = next(g).arrive_time
+
+    average_waiting_time = sum([process.getWaitingTime() for process in ext_process_list])/float(total_count)
+    return schedule, average_waiting_time
 
 def SRTF_scheduling(process_list):
     return (["to be completed, scheduling process_list on SRTF, using process.burst_time to calculate the remaining time of the current process "], 0.0)
@@ -79,21 +110,21 @@ def main(argv):
     for process in process_list:
         print (process)
 
-    print ("simulating FCFS ----")
-    FCFS_schedule, FCFS_avg_waiting_time =  FCFS_scheduling(process_list)
-    write_output('FCFS.txt', FCFS_schedule, FCFS_avg_waiting_time )
+    # print ("simulating FCFS ----")
+    # FCFS_schedule, FCFS_avg_waiting_time =  FCFS_scheduling(process_list)
+    # write_output('FCFS.txt', FCFS_schedule, FCFS_avg_waiting_time )
     
     print ("simulating RR ----")
     RR_schedule, RR_avg_waiting_time =  RR_scheduling(process_list,time_quantum = 2)
     write_output('RR.txt', RR_schedule, RR_avg_waiting_time )
     
-    print ("simulating SRTF ----")
-    SRTF_schedule, SRTF_avg_waiting_time =  SRTF_scheduling(process_list)
-    write_output('SRTF.txt', SRTF_schedule, SRTF_avg_waiting_time )
+    # print ("simulating SRTF ----")
+    # SRTF_schedule, SRTF_avg_waiting_time =  SRTF_scheduling(process_list)
+    # write_output('SRTF.txt', SRTF_schedule, SRTF_avg_waiting_time )
     
-    print ("simulating SJF ----")
-    SJF_schedule, SJF_avg_waiting_time =  SJF_scheduling(process_list, alpha = 0.5)
-    write_output('SJF.txt', SJF_schedule, SJF_avg_waiting_time )
+    # print ("simulating SJF ----")
+    # SJF_schedule, SJF_avg_waiting_time =  SJF_scheduling(process_list, alpha = 0.5)
+    # write_output('SJF.txt', SJF_schedule, SJF_avg_waiting_time )
 
 if __name__ == '__main__':
     main(sys.argv[1:])
