@@ -23,6 +23,12 @@ class Process:
     def __repr__(self):
         return ('[id %d : arrival_time %d,  burst_time %d]'%(self.id, self.arrive_time, self.burst_time))
 
+class ExtendedProcess(Process):
+    def __init__(self, id, arrive_time, burst_time):
+        super().__init__(id, arrive_time, burst_time)
+        self.completion_time = arrive_time + burst_time
+        self.remaining_time = burst_time
+
 def FCFS_scheduling(process_list):
     #store the (switching time, proccess_id) pair
     schedule = []
@@ -72,15 +78,19 @@ def main(argv):
     print ("printing input ----")
     for process in process_list:
         print (process)
+
     print ("simulating FCFS ----")
     FCFS_schedule, FCFS_avg_waiting_time =  FCFS_scheduling(process_list)
     write_output('FCFS.txt', FCFS_schedule, FCFS_avg_waiting_time )
+    
     print ("simulating RR ----")
     RR_schedule, RR_avg_waiting_time =  RR_scheduling(process_list,time_quantum = 2)
     write_output('RR.txt', RR_schedule, RR_avg_waiting_time )
+    
     print ("simulating SRTF ----")
     SRTF_schedule, SRTF_avg_waiting_time =  SRTF_scheduling(process_list)
     write_output('SRTF.txt', SRTF_schedule, SRTF_avg_waiting_time )
+    
     print ("simulating SJF ----")
     SJF_schedule, SJF_avg_waiting_time =  SJF_scheduling(process_list, alpha = 0.5)
     write_output('SJF.txt', SJF_schedule, SJF_avg_waiting_time )
