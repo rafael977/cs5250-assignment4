@@ -58,18 +58,18 @@ def RR_scheduling(process_list, time_quantum ):
     total_count = len(ext_process_list)
 
     while completed_count < total_count:
-        print(completed_count, total_count)
+        # print(completed_count, total_count)
         is_idle = True
         for process in ext_process_list:
             if process.arrive_time <= current_time and process.remaining_time > 0:
-                print("processing ", process.id, current_time)
+                # print("processing ", process.id, current_time)
                 schedule.append((current_time, process.id))
                 is_idle = False
                 if time_quantum < process.remaining_time:
                     current_time += time_quantum
                     process.remaining_time -= time_quantum
                 else:
-                    print(process.id, "completed")
+                    # print(process.id, "completed")
                     current_time += process.remaining_time
                     process.remaining_time = 0
                     process.completion_time = current_time
